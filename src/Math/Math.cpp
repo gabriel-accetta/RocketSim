@@ -57,10 +57,17 @@ float Math::RandFloat(float min, float max) {
 }
 
 std::default_random_engine& Math::GetRandEngine() {
+#if defined(__wasi__) && !defined(_REENTRANT)
+	// One thread and no thread ids in WebAssembly without threads; the fixed seed also makes
+	// every run replay the same way.
+	static std::default_random_engine randEngine = std::default_random_engine(0);
+	return randEngine;
+#else
 	static thread_local auto hashThreadID = std::hash<std::thread::id>();
 	static thread_local uint64_t seed = RS_CUR_MS() + hashThreadID(std::this_thread::get_id());
 	static thread_local std::default_random_engine randEngine = std::default_random_engine(seed);
 	return randEngine;
+#endif
 }
 
 float Math::WrapNormalizeFloat(float val, float minmax) {

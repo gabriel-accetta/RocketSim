@@ -24,9 +24,20 @@
 #include <chrono>
 #include <filesystem>
 #include <random>
+// WebAssembly without threads (wasm32-wasip1) has no <mutex> or <thread>; RocketSim only
+// guards its one-time init with a mutex, which a single thread does not need.
+#if defined(__wasi__) && !defined(_REENTRANT)
+struct RsNoMutex {
+	void lock() {}
+	void unlock() {}
+};
+typedef RsNoMutex RsMutex;
+#else
 #include <mutex>
-#include <bit>
 #include <thread>
+typedef std::mutex RsMutex;
+#endif
+#include <bit>
 #include <cstring>
 #include <array>
 
@@ -64,12 +75,21 @@ typedef uint8_t byte;
 
 #define RS_WARN(s) RS_LOG("ROCKETSIM WARNING: " << s)
 
+// Built without exceptions (e.g. WebAssembly), a fatal error logs and aborts.
+#ifdef __cpp_exceptions
 #define RS_ERR_CLOSE(s) { \
 	std::string _errorStr = RS_STR("ROCKETSIM FATAL ERROR: " << s); \
 	RS_LOG(_errorStr); \
 	throw std::runtime_error(_errorStr); \
 	exit(EXIT_FAILURE); \
 }
+#else
+#define RS_ERR_CLOSE(s) { \
+	std::string _errorStr = RS_STR("ROCKETSIM FATAL ERROR: " << s); \
+	RS_LOG(_errorStr); \
+	abort(); \
+}
+#endif
 
 #define RS_ALIGN_16 alignas(16)
 

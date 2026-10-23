@@ -30,7 +30,12 @@ subject to the following restrictions:
 #include <iostream>
 #include <mutex>
 
+// Built without exceptions (e.g. WebAssembly), a fatal error logs and aborts.
+#ifdef __cpp_exceptions
 #define THROW_ERR(msg) { std::string fullMsg = std::string() + "btRSBroadphase fatal error: " msg; std::cout << msg << std::endl; throw std::runtime_error(fullMsg); }
+#else
+#define THROW_ERR(msg) { std::cout << "btRSBroadphase fatal error: " msg << std::endl; abort(); }
+#endif
 
 void btRSBroadphase::validate() {
 	for (int i = 0; i < m_numHandles; i++) {

@@ -22,7 +22,7 @@ namespace RocketSim {
 	typedef std::vector<byte> FileData;
 
 	extern std::filesystem::path _collisionMeshesFolder;
-	extern std::mutex _beginInitMutex;
+	extern RsMutex _beginInitMutex;
 
 	void Init(std::filesystem::path collisionMeshesFolder, bool silent = false);
 

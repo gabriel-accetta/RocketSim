@@ -7,7 +7,7 @@
 using namespace RocketSim;
 
 std::filesystem::path RocketSim::_collisionMeshesFolder = {};
-std::mutex RocketSim::_beginInitMutex = {};
+RsMutex RocketSim::_beginInitMutex = {};
 
 struct MeshHashSet {
 	std::unordered_map<uint32_t, int> hashes;
