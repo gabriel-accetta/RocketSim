@@ -454,8 +454,10 @@ namespace RLConst {
 
 	const static LinearPieceCurve NON_STICKY_FRICTION_FACTOR_CURVE = {
 		{
+			// The knee is 0.707 in the game's own data (`Wheel_TA.WallFrictionCurve` of
+			// Archetypes.Car.Car_Default), not the measured 0.7075.
 			{0,			0.1f},
-			{0.7075f,	0.5f},
+			{0.707f,	0.5f},
 			{1,			1.0f}
 		}
 	};
